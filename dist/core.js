@@ -1,15 +1,38 @@
+window.addEventListener('load',() => {
+  const routes = {};
+
+const routerRenderClassNameChars = 'ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
+var routerRenderClassName = "";
+for (let i = 0; i < 8; i++) {
+  const rnum = Math.floor(Math.random() * routerRenderClassNameChars.length)
+  routerRenderClassName += routerRenderClassNameChars.substring(rnum, rnum + 1)
+};
+
+customElements.define('dom-router', class extends HTMLElement {
+  connectedCallback() {
+    if(this.getAttribute('path')){
+      routes[this.getAttribute('path')] = `${this.getAttribute('el')}`;
+    };
+
+    if(document.querySelector(`.${routerRenderClassName}`)){
+      this.outerHTML = "";
+    }else{
+      this.outerHTML = `<div class="${routerRenderClassName}"></div>`;
+    };
+  };
+});
+
+const routerLinkClassNameChars = 'ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
+var routerLinkClassName = "";
+for (let i = 0; i < 8; i++) {
+  const rnum = Math.floor(Math.random() * routerLinkClassNameChars.length)
+  routerLinkClassName += routerLinkClassNameChars.substring(rnum, rnum + 1)
+};
+
 customElements.define('dom-link', class extends HTMLElement {
   connectedCallback() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz'
-    let className = "";
-    let props = {};  
-    if(this.getAttribute('to')){
-      for (let i = 0; i < 8; i++) {
-        const rnum = Math.floor(Math.random() * chars.length)
-        className += chars.substring(rnum, rnum + 1)
-      };
-      Object.assign(props,{class:className});
-    };
+    let props = {};
+    Object.assign(props,{class:routerLinkClassName});
     if(this.getAttributeNames()) {  
       const AttrNames = this.getAttributeNames();
       AttrNames.forEach(attr => { 
@@ -22,36 +45,23 @@ customElements.define('dom-link', class extends HTMLElement {
             props[attr] = `${this.getAttribute(attr)}`;
           };
         }
-      });
+      }); 
     };
     this.outerHTML = nitron.createElement('a',props,this.innerHTML);
-    document.querySelectorAll(`.${className}[href^="/"]`).forEach(el => 
-      el.addEventListener("click", evt => {
-        evt.preventDefault();
-        const {pathname: path} = new URL(evt.target.href);
-        window.history.pushState({path}, path, path);
-      })
-    );
   };
 });
 
+const render = path => {
+  document.querySelector(`.${routerRenderClassName}`).innerHTML = routes[path] || routes["/404"];
+  document.querySelectorAll(`.${routerLinkClassName}[href^="/"]`).forEach(el => 
+    el.addEventListener("click", evt => {
+      evt.preventDefault();
+      const {pathname: path} = new URL(evt.target.href);
+      window.history.pushState({path}, path, path);
+      render(path);
+    })
+  );
+};
 
-var routes = {};
-
-customElements.define('dom-router', class extends HTMLElement {
-  connectedCallback() {
-    
-    if(routes[this.getAttribute('path')]){
-      routes[this.getAttribute('path')] += ` ${this.getAttribute('el')}`;
-    }else{
-      routes[this.getAttribute('path')] = `${this.getAttribute('el')}`;
-    };
-
-    if(window.location.pathname == this.getAttribute('path')){
-      this.outerHTML = this.getAttribute('el');
-    }else{
-      this.outerHTML = "";
-    };
-
-  };
+render(window.location.pathname);
 });
