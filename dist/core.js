@@ -1,25 +1,32 @@
+/*
+ * Nitron.js v1.0.0 - core
+ *
+ * (c) 2022 WADE Open Source Software and Nitron Team. and its affiliates.
+ * Released under the MIT License.
+ * https://github.com/WADE-OSS/nitron-router/blob/main/LICENSE
+ */
+
 window.addEventListener('load',() => {
   const routes = {};
-
-const routerRenderClassNameChars = 'ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
-var routerRenderClassName = "";
-for (let i = 0; i < 8; i++) {
-  const rnum = Math.floor(Math.random() * routerRenderClassNameChars.length)
-  routerRenderClassName += routerRenderClassNameChars.substring(rnum, rnum + 1)
-};
-
-customElements.define('dom-router', class extends HTMLElement {
-  connectedCallback() {
-    if(this.getAttribute('path')){
-      routes[this.getAttribute('path')] = `${this.getAttribute('el')}`;
-    };
-
-    if(document.querySelector(`.${routerRenderClassName}`)){
-      this.outerHTML = "";
-    }else{
-      this.outerHTML = `<div class="${routerRenderClassName}"></div>`;
-    };
+  const routerRenderClassNameChars = 'ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
+  var routerRenderClassName = "";
+  for (let i = 0; i < 8; i++) {
+    const rnum = Math.floor(Math.random() * routerRenderClassNameChars.length)
+    routerRenderClassName += routerRenderClassNameChars.substring(rnum, rnum + 1)
   };
+
+  customElements.define('dom-router', class extends HTMLElement {
+    connectedCallback() {
+      if(this.getAttribute('path')){
+        routes[this.getAttribute('path')] = `${this.getAttribute('el')}`;
+      };
+
+      if(document.querySelector(`.${routerRenderClassName}`)){
+        this.outerHTML = "";
+      }else{
+        this.outerHTML = `<div class="${routerRenderClassName}"></div>`;
+      };
+    };
 });
 
 const routerLinkClassNameChars = 'ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz';
@@ -28,7 +35,7 @@ for (let i = 0; i < 8; i++) {
   const rnum = Math.floor(Math.random() * routerLinkClassNameChars.length)
   routerLinkClassName += routerLinkClassNameChars.substring(rnum, rnum + 1)
 };
-
+length
 customElements.define('dom-link', class extends HTMLElement {
   connectedCallback() {
     let props = {};
@@ -64,4 +71,8 @@ const render = path => {
 };
 
 render(window.location.pathname);
+window.addEventListener("popstate", e =>
+  render(new URL(window.location.href).pathname)
+);
+
 });
